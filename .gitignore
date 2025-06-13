@@ -1,0 +1,5 @@
+.vscode
+hardware/out/
+code/build/
+build/
+hardware/beat_sequencer-backups/
