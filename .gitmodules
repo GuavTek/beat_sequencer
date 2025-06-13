@@ -1,0 +1,3 @@
+[submodule "code/lib/pio-ws2812-rp2040"]
+	path = code/lib/pio-ws2812-rp2040
+	url = https://github.com/dgatf/pio-ws2812-rp2040.git
