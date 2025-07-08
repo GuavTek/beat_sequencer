@@ -37,13 +37,14 @@ pico_sdk_init()
 
 add_executable(beat_sequencer
     src/main.c
+    src/leds.c
     )
 target_include_directories(beat_sequencer PUBLIC src)
 
 add_subdirectory(lib)
 
 # pull in common dependencies
-target_link_libraries(beat_sequencer pio_ws2812 pico_stdlib hardware_pio)
+target_link_libraries(beat_sequencer pio_ws2812 pico_stdlib hardware_pio hardware_dma)
 
 # create map/bin/hex file etc.
 pico_add_extra_outputs(beat_sequencer)
