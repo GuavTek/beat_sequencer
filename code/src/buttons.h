@@ -4,6 +4,7 @@
 #include "pico/stdlib.h"
 
 extern bool butts[80];
+extern int8_t renc_increment;
 
 void butt_update();
 

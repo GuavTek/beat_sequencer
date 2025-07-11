@@ -3,6 +3,7 @@
 
 bool butts[80];
 uint8_t current_col = 0;
+int8_t renc_increment;
 
 uint8_t columns[] = {
     PM_C1,
@@ -75,6 +76,28 @@ void butt_update(){
     current_col++;
     current_col &= 0b111;
     butt_col_select(current_col);
+
+    // Rotary encoder
+    static bool renc_state;
+    static uint8_t renc_debounce_a;
+    static uint8_t renc_debounce_b;
+    renc_debounce_a = (renc_debounce_a << 1) | gpio_get(RENC_A);
+    renc_debounce_b = (renc_debounce_b << 1) | gpio_get(RENC_B);
+    renc_debounce_a &= 0xf;
+    renc_debounce_b &= 0xf;
+    if ((renc_debounce_a == 0xf) && !renc_state){
+        // Positive edge
+        if (renc_debounce_b == 0xf){
+            renc_state = 1;
+            renc_increment += 1;
+        } else if (renc_debounce_b == 0) {
+            renc_state = 1;
+            renc_increment -= 1;
+        }
+    } else if ((renc_debounce_a == 0) && renc_state){
+        // Negative edge
+        renc_state = 0;
+    }
 }
 
 void butt_init(){
@@ -97,5 +120,8 @@ void butt_init(){
     gpio_init(PM_C7);
     gpio_init(PM_C8);
     butt_col_select(current_col);
+    // Initialize rotary encoder
+    gpio_init(RENC_A);
+    gpio_init(RENC_B);
 }
 
