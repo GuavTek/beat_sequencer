@@ -39,13 +39,14 @@ add_executable(beat_sequencer
     src/main.c
     src/leds.c
     src/buttons.c
+    src/usb_descriptor.c
     )
 target_include_directories(beat_sequencer PUBLIC src)
 
 add_subdirectory(lib)
 
 # pull in common dependencies
-target_link_libraries(beat_sequencer pio_ws2812 pico_stdlib hardware_pio hardware_dma hardware_gpio hardware_timer)
+target_link_libraries(beat_sequencer pio_ws2812 pico_stdlib pico_unique_id hardware_pio hardware_dma hardware_gpio hardware_timer tinyusb_device)
 
 # create map/bin/hex file etc.
 pico_add_extra_outputs(beat_sequencer)
