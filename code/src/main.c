@@ -57,6 +57,28 @@ int main() {
         if (butt_time < prev_time){
             butt_time = prev_time + 1000;
             butt_update();
+
+            // Rotary encoder
+            static bool renc_state;
+            static uint8_t renc_debounce_a;
+            static uint8_t renc_debounce_b;
+            renc_debounce_a = (renc_debounce_a << 1) | gpio_get(RENC_A);
+            renc_debounce_b = (renc_debounce_b << 1) | gpio_get(RENC_B);
+            renc_debounce_a &= 0xf;
+            renc_debounce_b &= 0xf;
+            if ((renc_debounce_a == 0xf) && !renc_state){
+                // Positive edge
+                if (renc_debounce_b == 0xf){
+                    renc_state = 1;
+                    renc_increment += 1;
+                } else if (renc_debounce_b == 0) {
+                    renc_state = 1;
+                    renc_increment -= 1;
+                }
+            } else if ((renc_debounce_a == 0) && renc_state){
+                // Negative edge
+                renc_state = 0;
+            }
         }
     }
 }
