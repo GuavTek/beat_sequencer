@@ -89,10 +89,10 @@ void butt_update(){
         // Positive edge
         if (renc_debounce_b == 0xf){
             renc_state = 1;
-            renc_increment += 1;
+            renc_increment -= 1;
         } else if (renc_debounce_b == 0) {
             renc_state = 1;
-            renc_increment -= 1;
+            renc_increment += 1;
         }
     } else if ((renc_debounce_a == 0) && renc_state){
         // Negative edge
