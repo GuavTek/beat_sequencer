@@ -63,15 +63,26 @@ int main() {
             butt_time = prev_time + 1000;
             butt_update();
 
-            // TODO: velocity multiplier
             // Has rotary encoder changed?
+            static uint32_t renc_mult;
+            static bool renc_dir;
             if (renc_increment != 0){
-                current_bpm += renc_increment;
+                if (renc_dir == (renc_increment > 0)){
+                    renc_mult += 0x200;
+                } else {
+                    // Direction changed, reset mult
+                    renc_mult = 0x200;
+                }
+                renc_dir = renc_increment > 0;
+                current_bpm += renc_increment * (renc_mult >> 9);
                 if (current_bpm < 10){
                     current_bpm = 10;
                 }
                 current_uspb = 60000000 / current_bpm;
                 renc_increment = 0;
+            }
+            if (renc_mult > 0){
+                renc_mult -= 1 + (renc_mult >> 9);
             }
             
             // Check buttons
