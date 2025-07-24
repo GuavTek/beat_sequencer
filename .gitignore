@@ -1,5 +1,7 @@
 .vscode
-hardware/out/
+hardware_mx/out/
+hardware_choc/out/
 code/build/
 build/
-hardware/beat_sequencer-backups/
+hardware_mx/beat_sequencer-backups/
+hardware_choc/beat_sequencer_choc-backups/
