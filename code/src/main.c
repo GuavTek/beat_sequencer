@@ -127,17 +127,20 @@ int main() {
                         r = (i >> 4)-1;
                         c = i & 0b1111;
                         if (butts[15]){
-                            led_set(r+2, max_idx[r]+1, 0, 0, 0);
+                            // Clear the previous end LED
+                            led_set(r+2, max_idx[r]+1, steps[r][max_idx[r]+1] * 64, 0, 0);
+                            // Set new end step
                             max_idx[r] = c;
                             led_set(r+2, c+1, 0, 0, 64);
-                            for (uint8_t j = c+2; j < 16; j++){
-                                steps[r][j] = 0;
-                                led_set(r+2, j, 0, 0, 0);
-                            }
+                            // Reset pointer if it has passed the new end step
                             if (current_idx[r] > c){
                                 current_idx[r] = 0;
                             }
-                        } else if (max_idx[r] >= c) {
+                            // Reset LEDs after new end step
+                            for (uint8_t i = c+2; i < 16; i++){
+                                led_set(r+2, i, steps[r][i]*64, 0, 0);
+                            }
+                        } else {
                             steps[r][c] = !steps[r][c];
                             led_set(r+2, c, steps[r][c] * 64, 0, 0);
                         }
@@ -150,6 +153,22 @@ int main() {
         if (step_time < prev_time){
             step_time = prev_time + current_uspb;
             step_state = !step_state;
+            // Flash end LED if that step is enabled
+            static uint8_t div_step;
+            div_step += 1;
+            div_step &= 0xf;
+            if (div_step == 0){
+                for (uint8_t i = 0; i < 4; i++){
+                    uint8_t c = max_idx[i]+1;
+                    if (!steps[i][c]) continue;
+                    led_set(i+2, c, 64, 0, 0);
+                }
+            } else if (div_step == 0x8){
+                for (uint8_t i = 0; i < 4; i++){
+                    uint8_t c = max_idx[i]+1;
+                    led_set(i+2, c, 0, 0, 64);
+                }
+            }
             if (step_state){
                 if (current_playing){
                     led_set(0,7,0,64,0);
