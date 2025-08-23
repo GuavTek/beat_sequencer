@@ -4161,7 +4161,7 @@
 				(justify left)
 			)
 		)
-		(property "Value" "RaspberryPi_Pico"
+		(property "Value" "RaspberryPi_Pico2"
 			(at 65.6433 116.84 0)
 			(effects
 				(font
