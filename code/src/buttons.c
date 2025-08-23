@@ -32,7 +32,7 @@ uint8_t rows[] = {
 // Set column low to select, set as input to deselect
 void butt_col_select(uint8_t col){
     // Set all columns as input to deselect
-    gpio_set_dir_masked(
+    gpio_put_masked(
         (1 << PM_C1)|
         (1 << PM_C2)|
         (1 << PM_C3)|
@@ -47,8 +47,7 @@ void butt_col_select(uint8_t col){
         return;
     }
     // Set the selected column as output and set it low
-    gpio_set_dir(columns[col], 1);
-    gpio_put(columns[col], 0);
+    gpio_put(columns[col], 1);
 }
 
 /*
@@ -119,6 +118,14 @@ void butt_init(){
     gpio_init(PM_C6);
     gpio_init(PM_C7);
     gpio_init(PM_C8);
+    gpio_set_dir(PM_C1, 1);
+    gpio_set_dir(PM_C2, 1);
+    gpio_set_dir(PM_C3, 1);
+    gpio_set_dir(PM_C4, 1);
+    gpio_set_dir(PM_C5, 1);
+    gpio_set_dir(PM_C6, 1);
+    gpio_set_dir(PM_C7, 1);
+    gpio_set_dir(PM_C8, 1);
     butt_col_select(current_col);
     // Initialize rotary encoder
     gpio_init(RENC_A);
