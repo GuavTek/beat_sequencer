@@ -17,7 +17,7 @@ uint8_t current_playing = 0;
 int8_t steps[NUM_CHANNELS][16];
 uint8_t current_idx[NUM_CHANNELS];
 uint8_t max_idx[NUM_CHANNELS];
-uint8_t velocities[4];
+uint8_t velocities[4] = {0, 42, 84, 127};
 bool step_state;
 
 void clamp_uint8(uint8_t* target, int32_t delta);
@@ -41,9 +41,12 @@ int main() {
     };
     tusb_init(BOARD_TUD_RHPORT, &dev_init);
 
-    // Initialize array
+    // Initialize arrays
     for (uint8_t i = 0; i < NUM_CHANNELS; i++){
         max_idx[i] = 15;
+        for (uint8_t j = 0; j < 16; j++){
+            steps[i][j] = -1;
+        }
     }
 
     led_set_step(0, 0, velocities[0]);
