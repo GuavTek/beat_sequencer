@@ -22,6 +22,7 @@ bool step_state;
 
 void clamp_uint8(uint8_t* target, int32_t delta);
 void midi_rx();
+void send_midi(uint8_t notes[], uint8_t velocity[], bool state, uint8_t num_notes);
 void led_set_step(uint8_t row, uint8_t col, int8_t vel);
 void led_set_end(uint8_t row, uint8_t col);
 void renc_change(int32_t delta);
@@ -115,18 +116,15 @@ int main() {
                                 }
                                 led_set_step(j+2, idx, steps[j][idx]);
                             }
+                            uint8_t notes[NUM_CHANNELS];
+                            uint8_t vels[NUM_CHANNELS] = {0};
+                            // Send note offs
                             for (uint8_t j = 0; j < NUM_CHANNELS; j++){
-                                // Send note offs
-                                if (tud_midi_mounted()){
-                                    uint8_t buff[3];
-                                    buff[0] = 0x89;
-                                    buff[1] = 0x20+j;
-                                    buff[2] = 0x0;
-                                    tud_midi_stream_write(0, buff, 3);
-                                }
+                                notes[j] = 0x20 + j;
                                 // Reset step index
                                 current_idx[j] = 0;
                             }
+                            send_midi(notes, vels, 0, NUM_CHANNELS);
                         }
                     } else if (i > 15){
                         // Step section
@@ -216,37 +214,35 @@ int main() {
                         }
                         led_set_step(i+2, idx, steps[i][idx]);
                     }
-                    // Send midi note on
-                    if (tud_midi_mounted()){
-                        uint8_t buff[3*NUM_CHANNELS];
-                        uint8_t len = 0;
-                        for (uint8_t i = 0; i < NUM_CHANNELS; i++){
-                            if (steps[i][current_idx[i]] >= 0){
-                                buff[len++] = 0x99;     // Note on
-                                buff[len++] = 0x20+i;   // key
-                                buff[len++] = steps[i][current_idx[i]] & 0x7f;     // velocity
-                            }
-                            tud_midi_stream_write(0,buff, len);
+                    uint8_t notes[NUM_CHANNELS];
+                    uint8_t vels[NUM_CHANNELS];
+                    uint8_t num_active;
+                    for (uint8_t i = 0; i < NUM_CHANNELS; i++){
+                        if (steps[i][current_idx[i]] >= 0){
+                            notes[num_active] = 0x20+i;
+                            vels[num_active] = steps[i][current_idx[i]];
+                            num_active++;
                         }
                     }
+                    // Send midi note on
+                    send_midi(notes, vels, 1, num_active);
                 } else {
                     led_set(0,7,64,0,0);
                 }
             } else {
                 led_set(0,7,0,0,0);
                 if (current_playing > 1){
-                    if (tud_midi_mounted()){
-                        uint8_t buff[3*NUM_CHANNELS];
-                        uint8_t len = 0;
-                        for (uint8_t i = 0; i < NUM_CHANNELS; i++){
-                            if(steps[i][current_idx[i]] >= 0){
-                                buff[len++] = 0x89;     // Note off
-                                buff[len++] = 0x20+i;   // key
-                                buff[len++] = 0x0;      // velocity
-                            }
+                    uint8_t notes[NUM_CHANNELS];
+                    uint8_t vels[NUM_CHANNELS] = {0};
+                    uint8_t num_active;
+                    for (uint8_t i = 0; i < NUM_CHANNELS; i++){
+                        if(steps[i][current_idx[i]] >= 0){
+                            notes[num_active] = 0x20+i;
+                            num_active++;
                         }
-                        tud_midi_stream_write(0, buff, len);
                     }
+                    // Send midi note off
+                    send_midi(notes, vels, 0, num_active);
                     for (uint8_t i = 0; i < NUM_CHANNELS; i++){
                         current_idx[i]++;
                         if (current_idx[i] > max_idx[i]){
@@ -278,6 +274,20 @@ void clamp_uint8(uint8_t* target, int32_t delta){
     } else {
         *target += delta;
     }
+}
+
+void send_midi(uint8_t notes[], uint8_t velocity[], bool state, uint8_t num_notes) {
+    if (!tud_midi_mounted()){
+        return;
+    }
+    uint8_t buff[3*NUM_CHANNELS];
+    uint8_t len = 0;
+    for (uint8_t i = 0; i < num_notes; i++){
+        buff[len++] = 0x89 | (state << 4);
+        buff[len++] = notes[i];
+        buff[len++] = velocity[i] & 0x7f;
+    }
+    tud_midi_stream_write(0, buff, len);
 }
 
 void led_set_step(uint8_t row, uint8_t col, int8_t vel){
