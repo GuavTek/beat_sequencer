@@ -335,7 +335,8 @@ void renc_change(int32_t delta){
         if (current_bpm < 10){
             current_bpm = 10;
         }
-        current_uspb = 60000000 / current_bpm;
+        // Convert bpm to microseconds per beat
+        current_uspb = 60000000 / (current_bpm*4);
     }
 }
 
