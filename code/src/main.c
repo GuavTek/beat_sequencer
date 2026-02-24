@@ -117,10 +117,11 @@ int main() {
                                 led_set_step(j+2, idx, steps[j][idx]);
                             }
                             uint8_t notes[NUM_CHANNELS];
-                            uint8_t vels[NUM_CHANNELS] = {0};
+                            uint8_t vels[NUM_CHANNELS];
                             // Send note offs
                             for (uint8_t j = 0; j < NUM_CHANNELS; j++){
                                 notes[j] = 0x20 + j;
+                                vels[j] = 0;
                                 // Reset step index
                                 current_idx[j] = 0;
                             }
@@ -216,7 +217,7 @@ int main() {
                     }
                     uint8_t notes[NUM_CHANNELS];
                     uint8_t vels[NUM_CHANNELS];
-                    uint8_t num_active;
+                    uint8_t num_active = 0;
                     for (uint8_t i = 0; i < NUM_CHANNELS; i++){
                         if (steps[i][current_idx[i]] >= 0){
                             notes[num_active] = 0x20+i;
@@ -233,11 +234,12 @@ int main() {
                 led_set(0,7,0,0,0);
                 if (current_playing > 1){
                     uint8_t notes[NUM_CHANNELS];
-                    uint8_t vels[NUM_CHANNELS] = {0};
-                    uint8_t num_active;
+                    uint8_t vels[NUM_CHANNELS];
+                    uint8_t num_active = 0;
                     for (uint8_t i = 0; i < NUM_CHANNELS; i++){
                         if(steps[i][current_idx[i]] >= 0){
                             notes[num_active] = 0x20+i;
+                            vels[num_active] = steps[i][current_idx[i]];
                             num_active++;
                         }
                     }
