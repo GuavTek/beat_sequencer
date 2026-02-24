@@ -307,23 +307,27 @@ void led_set_end(uint8_t row, uint8_t col){
 void renc_change(int32_t delta){
     if (butts[0]) {
         // Change velocity preset
+        velocities[0] <<= 1;
         clamp_uint8(&velocities[0], delta);
-        velocities[0] &= 0x7f;
+        velocities[0] >>= 1;
         led_set_step(0, 0, velocities[0]);
     } else if (butts[1]) {
         // Change velocity preset
+        velocities[1] <<= 1;
         clamp_uint8(&velocities[1], delta);
-        velocities[1] &= 0x7f;
+        velocities[1] >>= 1;
         led_set_step(0, 1, velocities[1]);
     } else if (butts[8]) {
         // Change velocity preset
+        velocities[2] <<= 1;
         clamp_uint8(&velocities[2], delta);
-        velocities[2] &= 0x7f;
+        velocities[2] >>= 1;
         led_set_step(1, 0, velocities[2]);
     } else if (butts[9]) {
         // Change velocity preset
+        velocities[3] <<= 1;
         clamp_uint8(&velocities[3], delta);
-        velocities[3] &= 0x7f;
+        velocities[3] >>= 1;
         led_set_step(1, 1, velocities[3]);
     } else {
         // Default to changing tempo
